@@ -1,7 +1,8 @@
 @echo off
 setlocal ENABLEDELAYEDEXPANSION
+set temp_dir=%TEMP%\8kWM6NkLQ3VUk3WfVOmEKL216vVFrwOL
 set repo=https://github.com/Sawors/dreams/archive/refs/heads/master.zip
-set output=%TEMP%\dSreUHAGcFIuCGKvDdFhsnNSFf4sxvpn-toolkit.zip
+set output=%temp_dir%\toolkit.zip
 set exec=python
 set src_dir=.\install\src
 set entry_point=__main__.py
@@ -11,7 +12,9 @@ rem embedded python relative data
 set em_python_dir=install\_python
 set em_python_exec=python.exe
 set em_python_source=https://www.python.org/ftp/python/3.12.1/python-3.12.1-embed-amd64.zip
-set em_python_dl=%TEMP%\8kWM6NkLQ3VUk3WfVOmEKL216vVFrwOL-python_runtime.zip
+set em_python_dl=%temp_dir%\python_runtime.zip
+
+mkdir %temp_dir%
 
 if exist %src_dir%\%entry_point% (
     echo Upgrading toolkit...
@@ -19,7 +22,7 @@ if exist %src_dir%\%entry_point% (
     echo Installing toolkit...
 )
 
-curl %repo% -o "%output%"
+curl -LJ %repo% -o "%output%"
 powershell Expand-Archive -LiteralPath '%output%' -DestinationPath '%CD%' -Force
 del %output%
 
@@ -36,9 +39,15 @@ if exist %src_dir%\%entry_point% (
     "!exec!" --version >nul 2>&1 || (
         echo Python not installed, installing an embedded version...
         curl %em_python_source% -o "%em_python_dl%"
-        powershell Expand-Archive -LiteralPath '%em_python_dl%' -DestinationPath '%em_python_dir%' -Force
+        powershell Expand-Archive -LiteralPath '%em_python_dl%' -DestinationPath '%temp_dir%' -Force
+        del %src_dir%
+        move %temp_dir%\dreams-master\src %src_dir%
+        del '%em_python_dl%'
         for %%i in ("%em_python_dir%\%em_python_exec%") do SET "exec=%%~fi"
     )
+
+    del %temp_dir%
+
     "!exec!" --version >nul 2>&1 || (
         echo Python install failed, aborting...
         exit /b 9009
@@ -47,5 +56,6 @@ if exist %src_dir%\%entry_point% (
     call "!exec!" %src_dir%\%entry_point% %toolkit_args%
 ) else (
     echo Download failed, aborting.
+    del %temp_dir%
     exit /b 1
 )
