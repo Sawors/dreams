@@ -23,9 +23,11 @@ class Color:
     WHITE   = "\033[0;37m"
     RESET   = "\033[0m"
 
+    @classmethod
     def from_int(int:int) -> str:
         return f"\033[0;{int}m"
 
+    @classmethod
     def color(str:str, color:str):
         return color+str+Color.RESET if not _no_color_print else str
 
@@ -49,7 +51,7 @@ class DirNames:
     FILE_CONFIG_SERVER = f"{SERVER}/serverconfig.json"
     FILE_VERSION_CONTENT = f"{PATCHNOTES}/version_content.txt"
     FILE_SERVER_MARKER = f"{SERVER}/is-server.json"
-    FILE_VERSION_CHECKER = f"{CONFIG}/bcc-common.toml"
+    FILE_VERSION_CHECKER = f"{CONFIG}/bcc.json"
 
 class ConfigType(NamedTuple):
     # if true use client config

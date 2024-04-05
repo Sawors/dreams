@@ -168,29 +168,20 @@ f"""  Version difference detected:
 
         print("✓ incrementation done!")
 
-    version_config_str = f"""
-#General settings
-[general]
-	#The CurseForge project ID for the modpack
-	#Range: > 0
-	modpackProjectID = 0
-	#The name of the modpack
-	modpackName = "{manifest.get('name', '?')}"
-	#The version of the modpack
-	modpackVersion = "{version}"
-	#Use the metadata.json to determine the modpack version
-	#ONLY ENABLE THIS IF YOU KNOW WHAT YOU ARE DOING
-	useMetadata = false
+    version_config_str = f"""\{
+  "projectID": 0,
+  "modpackName": "{manifest.get('name', '?')}",
+  "modpackVersion": "{version}",
+  "useMetadata": false
+\}"""
 
-
-"""
-    
     vrs_path = dreams.get_as_path(dreams.DirNames.FILE_VERSION_CHECKER)
     if not os.path.isdir(os.path.dirname(vrs_path)):
         os.makedirs(os.path.dirname(vrs_path))
-    with open(vrs_path,"w") as out:
+    with open(vrs_path,"w", encoding="UTF-8") as out:
         out.write(version_config_str)
-    
+
+
     bundle_list = dreams.list_content(root, include=include, exclude=exclude)
 
     release_dir = f"{root}/{DirNames.RELEASES}"
