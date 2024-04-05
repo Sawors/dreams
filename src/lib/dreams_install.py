@@ -7,18 +7,6 @@ from zipfile import ZipFile
 import json
 import lib.dreams as dreams
 from lib.dreams import Color
-##################################################
-#               CUSTOMIZABLE VALUES              #
-##################################################
-
-# URL of the repository where the modpack
-# versions are stored to download
-# when no manifest is available
-DEFAULT_REPOSITORY = "https://sawors.net/modpacks"
-
-##################################################
-#           END OF CUSTOMIZABLE VALUES           #
-##################################################
 
 class InstallMode:
     CLIENT = "client"

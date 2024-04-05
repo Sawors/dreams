@@ -443,7 +443,10 @@ def main(args:list):
     #
     # We consider that the modpack is already installed.
     
-    repository_url = dreams.get_config_option("repository", dreams_install.DEFAULT_REPOSITORY)
+    repository_url = dreams.get_config_option("repository", "")
+    if len(repository_url) < 1:
+        print("No repository has been found in the config, aborting upgrade.")
+        return
     interactive = "--interactive" in args
     upgrade_pack(install_mode,dreams.get_root(),repository_url,wait_for_confirm=interactive)
 
