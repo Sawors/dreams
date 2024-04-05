@@ -168,12 +168,15 @@ f"""  Version difference detected:
 
         print("✓ incrementation done!")
 
-    version_config_str = f"""{{
+    version_config_str = f"""
+{{
   "projectID": 0,
   "modpackName": "{manifest.get('name', '?')}",
   "modpackVersion": "{version}",
   "useMetadata": false
-}}"""
+}}
+
+"""
 
     vrs_path = dreams.get_as_path(dreams.DirNames.FILE_VERSION_CHECKER)
     if not os.path.isdir(os.path.dirname(vrs_path)):
