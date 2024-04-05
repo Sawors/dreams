@@ -17,7 +17,7 @@ else
 fi
 
 curl -LJ "$repo" -o "$download_dir/toolkit.zip"
-unzip "$download_dir/toolkit.zip" -d "$download_dir"
+unzip -qq "$download_dir/toolkit.zip" -d "$download_dir"
 mkdir -p "$src_dir"
 rm -r "${src_dir}/src"
 mv "${download_dir}/dreams-master/src" "$src_dir"
@@ -34,7 +34,7 @@ then
         exit 9009
     fi
     echo Automatically starting its execution...
-    /usr/bin/env python3 "$entry_point_path" $toolkit_args
+    /usr/bin/env python3 "$entry_point_path" $toolkit_args $@
 else
     echo Download failed, aborting.
     exit 1
