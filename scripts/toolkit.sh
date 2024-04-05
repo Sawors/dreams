@@ -2,7 +2,7 @@
 
 repo=https://github.com/Sawors/dreams/archive/refs/heads/master.zip
 download_dir=$(mktemp -d)
-src_dir=./install
+src_dir=${PWD}/install
 entry_point=__main__.py
 entry_point_path=${src_dir}/src/${entry_point}
 toolkit_args=--interactive
@@ -27,14 +27,14 @@ if test -f "${entry_point_path}";
 then
     echo Toolkit successfully installed !
 
-    if ! /usr/bin/env python --version 2>&1 > /dev/null;
+    if ! /usr/bin/env python3 --version 2>&1 > /dev/null;
     then
         rm -r "${src_dir}/src"
         echo Python not found, aborting.
         exit 9009
     fi
     echo Automatically starting its execution...
-    /usr/bin/env python "$entry_point_path" $toolkit_args
+    /usr/bin/env python3 "$entry_point_path" $toolkit_args
 else
     echo Download failed, aborting.
     exit 1

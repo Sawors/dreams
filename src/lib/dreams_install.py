@@ -2,13 +2,11 @@
 import os
 import shutil
 import tempfile
-import lib.dreams as dreams
 from http.client import HTTPConnection
 from zipfile import ZipFile
-import math
-from datetime import datetime
-from lib.dreams import Color
 import json
+import lib.dreams as dreams
+from lib.dreams import Color
 ##################################################
 #               CUSTOMIZABLE VALUES              #
 ##################################################
@@ -16,7 +14,7 @@ import json
 # URL of the repository where the modpack
 # versions are stored to download
 # when no manifest is available
-DEFAULT_REPOSITORY = "http://dreams.sawors.net:8080"
+DEFAULT_REPOSITORY = "https://sawors.net/modpacks"
 
 ##################################################
 #           END OF CUSTOMIZABLE VALUES           #
@@ -231,12 +229,12 @@ def install_pack(
                 mk.write("true")
 
 
-def install_standalone(mode: str, install_location:str, import_list=[], verbose=True, archive=None):
+def install_standalone(repo: str, mode: str, install_location:str, import_list=[], verbose=True, archive=None):
     download_tmp = tempfile.TemporaryDirectory()
 
     if archive is None:
         if verbose: print("downloading the modpack...")
-        archive = download_pack(DEFAULT_REPOSITORY,download_tmp.name)
+        archive = download_pack(repo,download_tmp.name)
         if verbose: print("download done!")
 
     if verbose: print("installing the modpack...")
@@ -250,7 +248,7 @@ def install_standalone(mode: str, install_location:str, import_list=[], verbose=
     if verbose: print("installation done!")
 
     download_tmp.cleanup()
-    if verbose: 
+    if verbose:
         print("cleanup done!")
         if mode == InstallMode.CLIENT:
             print("\n\n\nModpack ready, you may now create a profile in you launcher to use it.")
@@ -265,7 +263,13 @@ def main(args:list):
         print("currently using the server specific install")
 
     install_dir = dreams.get_root()
+    repo = ""
 
+    for a in args:
+        if not a.startswith("-r=") or a.startswith("--repo="):
+            continue
+        repo = a[a.find("=")+1:len(a)]
+    
     imports = []
 
     if "--import" in args or "-o" in args:
@@ -274,8 +278,16 @@ def main(args:list):
             "shaderpacks",
             "resourcepacks"
         ]
+    
     mc_dir = dreams.get_minecraft_dir()
     if "--interactive" in args:
+        while len(repo) < 1:
+            print("\nPlease enter the repository of your modpack :")
+            repo = input("( X ) to abort\nrepo (url): ")
+            if repo in ("X", "( X )"):
+                print("\naborting installation...")
+                return
+
         color_install_dir = Color.color(install_dir.replace("\\","/"),Color.CYAN)
         continue_prompt = f"\nThe modpack will be installed in {color_install_dir}"
         
@@ -296,7 +308,18 @@ def main(args:list):
         if not dreams.ask_user(continue_prompt):
             print("\naborting installation...")
             return
-    install_standalone(mode, install_dir, import_list=imports, verbose=True)
+    if len(repo) < 1:
+        print("Repository not provided, aborting installation.")
+        return
+    print(f"Repo: {repo}")
+    return
+    install_standalone(
+        repo,
+        mode,
+        install_dir,
+        import_list=imports,
+        verbose=True
+        )
 
 if __name__ == "__main__":
     main(os.sys.argv)

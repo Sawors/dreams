@@ -23,6 +23,8 @@ args_help_text = """Command line arguments :
     --no-hold        will close the script when done, even on interactive mode
 
     INSTALL:
+    --repo=<url>, -r set the repository from which the modpack should be
+                     downloaded
     --server, -s     use a custom installation process made for servers
     --import, -o     import the option.txt, resourcepacks/ and
                      shaderpacks/ from the .minecraft if it can be found
