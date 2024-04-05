@@ -2,10 +2,11 @@
 import os
 import shutil
 import tempfile
+from urllib.parse import urlparse
 import lib.dreams as dreams
 import lib.dreams_install as dreams_install
 from lib.dreams_install import InstallMode
-from http.client import HTTPConnection
+from http.client import HTTPSConnection
 from zipfile import ZipFile
 from datetime import datetime
 import json
@@ -155,16 +156,18 @@ class ContentDifference:
         return patch_str  
 
 def compute_difference(server_domain:str, reference_install:str, target_version:str, config:dict) -> ContentDifference:
+    parsed = urlparse(server_domain)
+    
     old_content = ContentDifference.get_content(reference_install,config)
     new_content = {}
-    connection = HTTPConnection(server_domain[server_domain.find("://")+3:len(server_domain)], timeout=10)
+    connection = HTTPSConnection(parsed.netloc, timeout=10)
     # first, get the latest version
     
     if not target_version is None:
         version_content_file = f"{target_version}/{dreams.DirNames.FILE_VERSION_CONTENT}"
     else:
         return None
-    connection.request("GET",f"{dreams.ServerLocation.VERSIONS}/{version_content_file}")
+    connection.request("GET",f"{parsed.path}{dreams.ServerLocation.VERSIONS}/{version_content_file}")
     with connection.getresponse() as response:
         if not response.status == 200:
             return None
@@ -182,19 +185,20 @@ def download_upgrade(
         diff:ContentDifference,
         verbose=True
     ):
+    parsed = urlparse(server_domain)
     _chunk_size = 65536
     if os.path.isfile(download_location):
         raise FileExistsError("file already exists")
     if not os.path.isdir(download_location):
         raise FileNotFoundError("download loaction does not exist")
 
-    connection = HTTPConnection(server_domain[server_domain.find("://")+3:len(server_domain)], timeout=180)
+    connection = HTTPSConnection(parsed.netloc, timeout=180)
     # downloading files in diff.added and diff.modified
     download_queue = diff.added + diff.modified
     queue_length = len(download_queue)
     try:
         for index, f in enumerate(download_queue):
-            connection.request("GET",urllib.parse.quote(f"{dreams.ServerLocation.VERSIONS}/{target_version}/{f}"))
+            connection.request("GET",urllib.parse.quote(f"{parsed.path}{dreams.ServerLocation.VERSIONS}/{target_version}/{f}"))
             dl_target = f"{download_location}/{f}"
             if not os.path.isdir(os.path.dirname(dl_target)):
                 os.makedirs(os.path.dirname(dl_target))
