@@ -9,7 +9,10 @@ class RunMode:
     UPGRADE = "upgrade"
     REPORT = "report"
     BUNDLE = "bundle"
+    PUBLISH = "publish"
 
+# Publish is voluntarly not in the help text to avoid users attempting to
+# publish without permission
 args_help_text = """Command line arguments :
 
     GLOBAL:
@@ -120,6 +123,9 @@ def main(args):
         case RunMode.BUNDLE | "4":
             print("bundling...")
             lib.dreams_bundle.main(args)
+        case RunMode.PUBLISH | "5":
+            print("starting publication...")
+            lib.dreams_publish.main(args)
         case "exit" | "x":
             exit()
         case _:

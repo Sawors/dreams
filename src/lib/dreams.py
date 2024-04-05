@@ -44,6 +44,7 @@ class DirNames:
     SERVER = f"{INSTALL}/server"
     FILE_MANIFEST = f"{INSTALL}/dreams-manifest.json"
     FILE_CONFIG = f"{INSTALL}/config.json"
+    FILE_CONFIG_PUBLICATION = f"{INSTALL}/publish.json"
     FILE_CONFIG_SERVER = f"{SERVER}/serverconfig.json"
     FILE_VERSION_CONTENT = f"{PATCHNOTES}/version_content.txt"
     FILE_SERVER_MARKER = f"{SERVER}/is-server.json"
