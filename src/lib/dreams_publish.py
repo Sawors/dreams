@@ -11,8 +11,6 @@ def main(args:list):
     latest = sorted(os.listdir(rel_dir),reverse=True)[0]
     latest_path = f"{rel_dir}/{latest}".replace("\\","/")
 
-    psswd = args[len(args)-1] if len(args) > 0 else None
-
     config_publish_file = dreams.get_as_path(dreams.DirNames.FILE_CONFIG_PUBLICATION).replace("\\","/")
     if not os.path.isfile(config_publish_file):
         print("Publication config not found, aborting.")
@@ -38,8 +36,7 @@ def main(args:list):
 
     release_bundle_command = f"cd $HOME/webserver/modpacks && python3 update_release.py {modpack_name}"
 
-    if psswd is None:
-        psswd = input(f"Password to the ftp server (u:{user}) : ").strip()
+    psswd = input(f"Password to the ftp server (u:{user}) : ").strip()
 
 
     with pysftp.Connection(server, username=user, password=psswd) as sftp:
