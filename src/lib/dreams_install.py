@@ -15,12 +15,13 @@ class InstallMode:
     CLIENT = "client"
     SERVER = "server"
 
-def get_latest_release_name(server_domain:str) -> tuple[str,str]:
+def get_latest_release_name(repo:str) -> tuple[str,str]:
     latest_version_name = None
     latest_version = None
-    connection = HTTPSConnection(server_domain[server_domain.find("://")+3:len(server_domain)], timeout=180)
+    parsed = urlparse(repo)
+    connection = HTTPSConnection(parsed.netloc, timeout=180)
     # first, get the latest version
-    connection.request("GET",dreams.ServerLocation.LATEST_META)
+    connection.request("GET",f"{parsed.path}/{dreams.ServerLocation.LATEST_META}")
     with connection.getresponse() as response:
         if not response.status == 200:
             return None

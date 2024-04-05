@@ -120,9 +120,13 @@ def main(args:list):
     target_version = version
     should_upgrade = "--increment" in args or "-i" in args
     interactive = "--interactive" in args
-    if should_upgrade or interactive:
+    release_dir = dreams.get_as_path(DirNames.RELEASES)
+    first_release = not os.path.isdir(release_dir) or len(os.listdir(release_dir)) == 0
+    if not os.path.isdir(release_dir):
+        os.mkdir(release_dir)
+    if not first_release and (should_upgrade or interactive):
         print("  calculating version difference for auto increment...")
-        last_version = sorted(os.listdir(dreams.get_as_path(DirNames.RELEASES)),reverse=True)[0]
+        last_version = sorted(os.listdir(release_dir),reverse=True)[0]
         if not last_version[last_version.rfind("-")+1:len(last_version)] == version:
             print("  version increment explicitly specified, skipping.")
         else:
