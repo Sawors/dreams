@@ -19,7 +19,8 @@ def main(args:list):
         return
     config_publish = {}
     try:
-        config_publish = json.loads(config_publish_file)
+        with open(config_publish_file,"r",encoding="UTF-8") as infile:
+            config_publish = json.load(infile)
     except Exception:
         print("Could not load the publication config, aborting.")
         return
