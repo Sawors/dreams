@@ -271,9 +271,9 @@ def main(args:list):
     if "--interactive" in args:
         while len(repo) < 1:
             print("\nPlease enter the repository of your modpack :")
-            repo = input("(x) to abort\nrepo (url): ")
+            repo = input("to abort: x\nrepo (url): ")
             if repo.lower() in ("x", "(x)"):
-                print("\naborting installation...")
+                print("\nAborting installation...")
                 return
 
         color_install_dir = Color.color(install_dir.replace("\\","/"),Color.CYAN)
@@ -294,13 +294,13 @@ def main(args:list):
                     continue_prompt += f"\n  {i}"
         continue_prompt += "\n\nAccept and continue with the installation ?"
         if not dreams.ask_user(continue_prompt):
-            print("\naborting installation...")
+            print("\nAborting installation...")
             return
+
     if len(repo) < 1:
         print("Repository not provided, aborting installation.")
         return
-    print(f"Repo: {repo}")
-    return
+
     install_standalone(
         repo,
         mode,
