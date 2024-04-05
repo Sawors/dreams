@@ -9,6 +9,8 @@ from urllib.parse import urlparse
 import lib.dreams as dreams
 from lib.dreams import Color
 
+DEFAULT_REPOSITORY_PATH = "https://sawors.net/modpacks"
+
 class InstallMode:
     CLIENT = "client"
     SERVER = "server"
@@ -300,6 +302,12 @@ def main(args:list):
     if len(repo) < 1:
         print("Repository not provided, aborting installation.")
         return
+    
+    parsed = urlparse(repo)
+    if len(parsed.scheme) < 1 and not "/" in repo:
+        # allowing a shortcut to my own general
+        # repository if only the name is provided
+        repo = f"{DEFAULT_REPOSITORY_PATH}/{repo}"
 
     install_standalone(
         repo,

@@ -1,4 +1,12 @@
 @echo off
+
+rem ######################[EDIT THIS]########################
+
+rem Add '--no-color' if your terminal does not support colors
+set toolkit_args=--interactive
+
+rem #########################################################
+
 setlocal ENABLEDELAYEDEXPANSION
 set temp_dir=%TEMP%\8kWM6NkLQ3VUk3WfVOmEKL216vVFrwOL
 set repo=https://github.com/Sawors/dreams/archive/refs/heads/master.zip
@@ -6,7 +14,6 @@ set output=%temp_dir%\toolkit.zip
 set exec=python
 set src_dir=.\install\src
 set entry_point=__main__.py
-set toolkit_args=--interactive
 
 rem embedded python relative data
 set em_python_dir=install\_python
