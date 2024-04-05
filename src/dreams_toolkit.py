@@ -1,7 +1,7 @@
 #!/bin/env python3
 from __future__ import print_function
 import os, platform
-import lib.dreams, lib.dreams_bundle, lib.dreams_install, lib.dreams_report, lib.dreams_upgrade
+import lib.dreams, lib.dreams_bundle, lib.dreams_install, lib.dreams_report, lib.dreams_upgrade, lib.dreams_publish
 from lib.dreams import Color
 
 class RunMode:
