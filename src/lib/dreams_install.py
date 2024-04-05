@@ -221,7 +221,7 @@ def install_standalone(repo: str, mode: str, install_location:str, import_list=[
     download_tmp = tempfile.TemporaryDirectory()
 
     if archive is None:
-        if verbose: print("downloading the modpack...")
+        if verbose: print(f"downloading the modpack from {repo}...")
         archive = download_pack(repo,download_tmp.name)
         if verbose: print("download done!")
 
