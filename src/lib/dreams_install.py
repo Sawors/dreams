@@ -40,7 +40,7 @@ def download_pack(url:str, download_location:str, verbose=True) -> str:
     print(dl_target)
     parsed_url = urlparse(url)
     connection = HTTPConnection(parsed_url.netloc, timeout=10)
-    connection.request("GET", dreams.ServerLocation.LATEST_ARCHIVE)
+    connection.request("GET", f"{parsed_url.path}{dreams.ServerLocation.LATEST_ARCHIVE}")
     with connection.getresponse() as response:
         headers = response.getheaders()
         length_header = [v for k,v in headers if k == "Content-Length"]
@@ -301,6 +301,16 @@ def main(args:list):
     if len(repo) < 1:
         print("Repository not provided, aborting installation.")
         return
+
+    parsed_url = urlparse(repo)
+    print(parsed_url.hostname)
+    print(parsed_url.netloc)
+    print(parsed_url.params)
+    print(parsed_url.path)
+    print(parsed_url.query)
+    print(parsed_url.scheme)
+    print(parsed_url.port)
+    return
 
     install_standalone(
         repo,
