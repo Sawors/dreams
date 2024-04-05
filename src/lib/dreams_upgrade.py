@@ -383,6 +383,7 @@ def upgrade_pack(install_mode: str, install_location:str, repository:str, verbos
         # MEMORY FOOTPRINT HERE WE GOOOOOOOOOOOOOOOO !!!!!!!!!!!!!!!!
         # COPY! COPY! COPY!, WASTE THAT RAM !!(haven't found a better way)
         client_only = config.get("client-side-only",[])
+        print(client_only)
         for k in diff.added.copy():
             if any(i for i in client_only if k.startswith(i)):
                 diff.added.remove(k)
