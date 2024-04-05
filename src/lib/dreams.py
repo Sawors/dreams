@@ -1,5 +1,5 @@
 #!/bin/env python3
-from http.client import HTTPConnection
+from http.client import HTTPSConnection
 import os
 import json
 import hashlib
@@ -8,6 +8,7 @@ from pathlib import Path
 import platform
 import subprocess
 from typing import NamedTuple
+from urllib.parse import urlparse
 
 _no_color_print = False
 
@@ -141,10 +142,11 @@ def get_config(
     else:
         if remote_root is None or len(remote_root) < 1:
             raise ConnectionRefusedError(f"remote '{remote_root}' does not exist")
+        parsed = urlparse(remote_root)
         split = remote_root.split("/")
-        domain = split[2]
-        resource = "/".join(split[3:]) + "/" + rel_config
-        connection = HTTPConnection(domain, timeout=180)
+        domain = parsed.netloc
+        resource = f"{parsed.path}/{rel_config}"
+        connection = HTTPSConnection(domain, timeout=180)
         # first, get the latest version
         connection.request("GET",resource)
         with connection.getresponse() as response:
