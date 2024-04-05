@@ -13,7 +13,7 @@ def main(args:list):
 
     psswd = args[len(args)-1] if len(args) > 0 else None
 
-    config_publish_file = {dreams.get_as_path(dreams.DirNames.FILE_CONFIG_PUBLICATION)}
+    config_publish_file = dreams.get_as_path(dreams.DirNames.FILE_CONFIG_PUBLICATION).replace("\\","/")
     if not os.path.isfile(config_publish_file):
         print("Publication config not found, aborting.")
         return
