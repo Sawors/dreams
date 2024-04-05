@@ -367,7 +367,7 @@ def upgrade_pack(install_mode: str, install_location:str, repository:str, verbos
     # COMPLETELY OVERRIDE the one in client config.
     if install_mode == InstallMode.SERVER:
         serverconfig = dreams.get_config(
-            type=dreams.ConfigType(False,True),
+            type=dreams.ConfigType(False,is_local),
             remote_root=config_remote_root
         )
         print(serverconfig)
