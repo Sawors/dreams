@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import os
 import json
-import pysftp
-import paramiko
 import lib.dreams as dreams
 
 def main(args:list):
+    import pysftp
+    import paramiko    
+    
     rel_dir = dreams.get_as_path(dreams.DirNames.RELEASES).replace("\\","/")
     manifest = dreams.get_manifest()
     latest = sorted(os.listdir(rel_dir),reverse=True)[0]
