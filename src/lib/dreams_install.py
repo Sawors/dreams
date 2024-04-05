@@ -37,7 +37,6 @@ def download_pack(url:str, download_location:str, verbose=True) -> str:
     if os.path.isfile(download_location):
         raise FileExistsError("file already exists")
     dl_target = f"{download_location}{dreams.ServerLocation.LATEST_ARCHIVE}"
-    print(dl_target)
     parsed_url = urlparse(url)
     connection = HTTPSConnection(parsed_url.netloc, timeout=10)
     connection.request("GET", f"{parsed_url.path}{dreams.ServerLocation.LATEST_ARCHIVE}")
@@ -104,8 +103,8 @@ def import_options(dest:str, import_list:list, override=True, verbose=True):
         if not os.path.isdir(os.path.dirname(dest_path)):
             os.makedirs(os.path.dirname(dest_path))
         shutil.copy(f, dest_path)
-        
-    
+
+
 
 def install_pack(
         archive:str, 
