@@ -5,6 +5,7 @@ import tempfile
 from http.client import HTTPConnection
 from zipfile import ZipFile
 import json
+from urllib.parse import urlparse
 import lib.dreams as dreams
 from lib.dreams import Color
 
@@ -36,9 +37,9 @@ def download_pack(url:str, download_location:str, verbose=True) -> str:
     if os.path.isfile(download_location):
         raise FileExistsError("file already exists")
     dl_target = f"{download_location}{dreams.ServerLocation.LATEST_ARCHIVE}"
-
-    domain = url[url.find("://")+3:len(url)]
-    connection = HTTPConnection(domain, timeout=10)
+    print(dl_target)
+    parsed_url = urlparse(url)
+    connection = HTTPConnection(parsed_url.netloc, timeout=10)
     connection.request("GET", dreams.ServerLocation.LATEST_ARCHIVE)
     with connection.getresponse() as response:
         headers = response.getheaders()
