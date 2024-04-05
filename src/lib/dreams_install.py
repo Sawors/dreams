@@ -2,7 +2,7 @@
 import os
 import shutil
 import tempfile
-from http.client import HTTPConnection
+from http.client import HTTPSConnection
 from zipfile import ZipFile
 import json
 from urllib.parse import urlparse
@@ -16,7 +16,7 @@ class InstallMode:
 def get_latest_release_name(server_domain:str) -> tuple[str,str]:
     latest_version_name = None
     latest_version = None
-    connection = HTTPConnection(server_domain[server_domain.find("://")+3:len(server_domain)], timeout=180)
+    connection = HTTPSConnection(server_domain[server_domain.find("://")+3:len(server_domain)], timeout=180)
     # first, get the latest version
     connection.request("GET",dreams.ServerLocation.LATEST_META)
     with connection.getresponse() as response:
@@ -39,7 +39,7 @@ def download_pack(url:str, download_location:str, verbose=True) -> str:
     dl_target = f"{download_location}{dreams.ServerLocation.LATEST_ARCHIVE}"
     print(dl_target)
     parsed_url = urlparse(url)
-    connection = HTTPConnection(parsed_url.netloc, timeout=10)
+    connection = HTTPSConnection(parsed_url.netloc, timeout=10)
     connection.request("GET", f"{parsed_url.path}{dreams.ServerLocation.LATEST_ARCHIVE}")
     with connection.getresponse() as response:
         headers = response.getheaders()
@@ -255,9 +255,9 @@ def main(args:list):
     repo = ""
 
     for a in args:
-        if not a.startswith("-r=") or a.startswith("--repo="):
-            continue
-        repo = a[a.find("=")+1:len(a)]
+        if a.startswith("-r=") or a.startswith("--repo="):
+            repo = a[a.find("=")+1:len(a)]
+            break
     
     imports = []
 
@@ -301,16 +301,6 @@ def main(args:list):
     if len(repo) < 1:
         print("Repository not provided, aborting installation.")
         return
-
-    parsed_url = urlparse(repo)
-    print(parsed_url.hostname)
-    print(parsed_url.netloc)
-    print(parsed_url.params)
-    print(parsed_url.path)
-    print(parsed_url.query)
-    print(parsed_url.scheme)
-    print(parsed_url.port)
-    return
 
     install_standalone(
         repo,

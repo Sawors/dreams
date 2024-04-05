@@ -1,1 +1,4 @@
 scripts/install
+__pycache__/
+/install
+/tests
