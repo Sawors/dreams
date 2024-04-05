@@ -271,8 +271,8 @@ def main(args:list):
     if "--interactive" in args:
         while len(repo) < 1:
             print("\nPlease enter the repository of your modpack :")
-            repo = input("( X ) to abort\nrepo (url): ")
-            if repo in ("X", "( X )"):
+            repo = input("(x) to abort\nrepo (url): ")
+            if repo.lower() in ("x", "(x)"):
                 print("\naborting installation...")
                 return
 
