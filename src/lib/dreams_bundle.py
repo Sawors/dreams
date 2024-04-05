@@ -195,7 +195,7 @@ f"""  Version difference detected:
 
     release_dir = f"{root}/{DirNames.RELEASES}"
 
-    dir_name = f"{manifest['name']}-{version}"
+    dir_name = f"{version}"
     dir_path = f"{release_dir}/{dir_name}".replace("\\","/")
 
     if os.path.isdir(dir_path):

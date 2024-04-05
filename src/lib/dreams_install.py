@@ -21,7 +21,7 @@ def get_latest_release_name(repo:str) -> tuple[str,str]:
     parsed = urlparse(repo)
     connection = HTTPSConnection(parsed.netloc, timeout=180)
     # first, get the latest version
-    connection.request("GET",f"{parsed.path}/{dreams.ServerLocation.LATEST_META}")
+    connection.request("GET",f"{parsed.path}{dreams.ServerLocation.LATEST_META}")
     with connection.getresponse() as response:
         if not response.status == 200:
             return None
