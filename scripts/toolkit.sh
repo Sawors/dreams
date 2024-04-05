@@ -2,6 +2,7 @@
 
 repo=https://github.com/Sawors/dreams/archive/refs/heads/master.zip
 download_dir=./.toolkit
+mkdir "$download_dir"
 src_dir=${PWD}/install
 entry_point=__main__.py
 entry_point_path=${src_dir}/src/${entry_point}
