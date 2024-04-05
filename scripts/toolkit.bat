@@ -64,7 +64,7 @@ if exist %src_dir%\%entry_point% (
     )
     echo:
     echo ------------------------------------------------------------------
-    echo  Toolkit and python successfully installed, starting execution...
+    echo        Toolkit installed and ready, starting execution...
     echo:
     call "!exec!" %src_dir%\%entry_point% %toolkit_args%
 ) else (
