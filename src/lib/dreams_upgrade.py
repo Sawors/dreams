@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import os
 import shutil
 import tempfile
@@ -176,6 +176,7 @@ def compute_difference(server_domain:str, reference_install:str, target_version:
         return None
     
     connection.close()
+    
     return ContentDifference(old_content, new_content)
 
 def download_upgrade(
@@ -374,8 +375,23 @@ def upgrade_pack(install_mode: str, install_location:str, repository:str, verbos
 
     if verbose: 
         print(f"latest release is {latest[1]}")
-        print(f"determinating patch content...")
+        print("determinating patch content...")
     diff = compute_difference(repository, install_location, latest[1], config=config)
+
+    if install_mode == InstallMode.SERVER:
+        # removing every entry marked "client side only" from the difference.
+        # MEMORY FOOTPRINT HERE WE GOOOOOOOOOOOOOOOO !!!!!!!!!!!!!!!!
+        # COPY! COPY! COPY!, WASTE THAT RAM !!(haven't found a better way)
+        client_only = config.get("client-side-only",[])
+        for k in diff.added.copy():
+            if any(i for i in client_only if k.startswith(i)):
+                diff.added.remove(k)
+        for k in diff.modified.copy():
+            if any(i for i in client_only if k.startswith(i)):
+                diff.modified.remove(k)
+        for k in diff.removed.copy():
+            if any(i for i in client_only if k.startswith(i)):
+                diff.removed.remove(k)
 
     if wait_for_confirm:
         print(f"\nThe modpack will be upgraded from {dreams.get_manifest().get('version','?')} to {latest[0]}.")
