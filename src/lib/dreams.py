@@ -23,11 +23,9 @@ class Color:
     WHITE   = "\033[0;37m"
     RESET   = "\033[0m"
 
-    @classmethod
-    def from_int(int:int) -> str:
-        return f"\033[0;{int}m"
+    def from_int(value:int) -> str:
+        return f"\033[0;{value}m"
 
-    @classmethod
     def color(str:str, color:str):
         return color+str+Color.RESET if not _no_color_print else str
 
