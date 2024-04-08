@@ -93,11 +93,20 @@ def get_minecraft_dir() -> str:
     # to find it in the user home directory
     
     os_name = platform.platform()
+    home = Path.home()
     if os_name.startswith("Windows"):
-        home = Path.home()
         mc_dir = f"{home}/AppData/Roaming/.minecraft"
         if os.path.isdir(mc_dir) and len(os.listdir(mc_dir)) > 0:
             return mc_dir.replace("\\","/")
+    elif os_name.startswith("Linux"):
+        check_dirs = [
+            f"{home}/.minecraft",
+            f"{home}/.var/app/com.mojang.Minecraft/.minecraft"
+        ]
+        for dr in check_dirs:
+            if os.path.isdir(dr) and len(os.listdir(dr)) > 0:
+                return dr
+    
     return None
         
 

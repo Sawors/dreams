@@ -5,6 +5,7 @@ import tempfile
 from http.client import HTTPSConnection
 from zipfile import ZipFile
 import json
+from datetime import datetime
 from urllib.parse import urlparse
 import lib.dreams as dreams
 from lib.dreams import Color
@@ -34,6 +35,50 @@ def get_latest_release_name(repo:str) -> tuple[str,str]:
             pass
     connection.close()
     return (latest_version,latest_version_name)
+
+# profile related functions
+def generate_profile_data(manifest_data:dict, minecraft_dir:str) -> dict:
+    mc_path = minecraft_dir if not minecraft_dir.replace("\\","/").endswith("/") else minecraft_dir.replace("\\","/")[:len(minecraft_dir.replace("\\","/"))-1]
+    version_dir = f"{mc_path}/versions"
+    profile_file = f"{mc_path}/launcher_profiles.json"
+    if not (
+        os.path.isdir(mc_path)
+        and os.path.isdir(version_dir)
+        and os.path.isfile(profile_file)
+    ):
+        raise OSError("Launcher files could not be found")
+    target_modloader = manifest["modloader"]
+    target_version = manifest_data["game-version"]
+    fitting_versions = filter(lambda x: target_modloader.lower() in x and target_version.lower() in x, os.listdir(version_dir))
+    if len(fitting_versions) < 1:
+        raise FileNotFoundError("Version could not be found")
+    best_version = sorted(fitting_versions, reverse=True)
+    launcher_data = {}
+    with open(profile_file, "r", encoding="UTF-8") as datain:
+        profiles_data = json.load(datain)
+    profiles = data["profiles"]
+    now = datetime.now()
+    millis = now.strftime("%f")[0:3]
+    now_str = now.strftime(f"%Y-%m-%dT%H:%M:%S.{millis}z")
+
+    custom_profile = {
+        "created": now_str,
+        "gameDir": dreams.get_root(),
+        "icon": "Gold_Ore",
+        "javaArgs" : "-Xmx6G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M",
+        "lastUsed": now_str,
+        "lastVersionId": best_version,
+        "name": manifest_data["name"],
+        "type": "custom"
+    }
+    profile_name = f"{manifest_data['name']-{manifest_data['game-version']}}"
+    profiles[profile_name] = profiles_data
+
+    print(json.dumps(
+        profiles,
+        indent=4
+        ))
+
 
 def download_pack(url:str, download_location:str, verbose=True) -> str:
     _chunk_size = 1024*1024
