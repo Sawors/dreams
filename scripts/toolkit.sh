@@ -22,7 +22,7 @@ unzip -qq "$download_dir/toolkit.zip" -d "$download_dir"
 mkdir -p "$src_dir"
 rm -r "${src_dir}/src"
 mv "${download_dir}/dreams-master/src" "$src_dir"
-mv "${download_dir}/dreams-master/scripts/toolkit.sh" "$PWD/"
+# mv "${download_dir}/dreams-master/scripts/toolkit.sh" "$PWD/"
 rm -r "$download_dir"
 
 if test -f "${entry_point_path}";

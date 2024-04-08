@@ -35,7 +35,7 @@ del /F /S /Q %src_dir% >nul 2>&1
 rmdir /S /Q %src_dir% >nul 2>&1
 mkdir .\install >nul 2>&1
 move /y "%temp_dir%\dreams-master\src" ".\install" >nul 2>&1
-move /y "%temp_dir%\dreams-master\scripts\toolkit.bat" ".\" >nul 2>&1
+rem move /y "%temp_dir%\dreams-master\scripts\toolkit.bat" ".\" >nul 2>&1
 del /F /S /Q %output% >nul 2>&1
 
 if exist %src_dir%\%entry_point% (
