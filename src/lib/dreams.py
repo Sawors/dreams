@@ -88,7 +88,7 @@ def get_minecraft_dir() -> str:
     for i in range(len(split)-1,0,-1):
         step = split[i]
         if step == ".minecraft":
-            return "/".join(split[0:i])
+            return "/".join(split[0:i+1])
     # .minecraft not found by recursion, trying
     # to find it in the user home directory
     
@@ -105,6 +105,7 @@ def get_minecraft_dir() -> str:
         ]
         for dr in check_dirs:
             if os.path.isdir(dr) and len(os.listdir(dr)) > 0:
+                print(f"dr: {dr}")
                 return dr
     
     return None

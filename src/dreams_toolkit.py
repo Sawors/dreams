@@ -53,12 +53,6 @@ args_help_text = """Command line arguments :
 """
 
 def main(args):
-    dreams_install.generate_profile_data(
-        dreams.get_manifest(),
-        dreams.get_minecraft_dir(),
-        
-    )
-    return
 
     lib.dreams._no_color_print = "--no-color" in args
 

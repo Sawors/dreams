@@ -47,16 +47,16 @@ def generate_profile_data(manifest_data:dict, minecraft_dir:str) -> dict:
         and os.path.isfile(profile_file)
     ):
         raise OSError("Launcher files could not be found")
-    target_modloader = manifest["modloader"]
+    target_modloader = manifest_data["modloader"]
     target_version = manifest_data["game-version"]
-    fitting_versions = filter(lambda x: target_modloader.lower() in x and target_version.lower() in x, os.listdir(version_dir))
+    fitting_versions = list(filter(lambda x: target_modloader.lower() in x and target_version.lower() in x, os.listdir(version_dir)))
     if len(fitting_versions) < 1:
         raise FileNotFoundError("Version could not be found")
-    best_version = sorted(fitting_versions, reverse=True)
+    best_version = sorted(fitting_versions, reverse=True)[0]
     launcher_data = {}
     with open(profile_file, "r", encoding="UTF-8") as datain:
-        profiles_data = json.load(datain)
-    profiles = data["profiles"]
+        launcher_data = json.load(datain)
+    profiles = launcher_data["profiles"]
     now = datetime.now()
     millis = now.strftime("%f")[0:3]
     now_str = now.strftime(f"%Y-%m-%dT%H:%M:%S.{millis}z")
@@ -71,13 +71,13 @@ def generate_profile_data(manifest_data:dict, minecraft_dir:str) -> dict:
         "name": manifest_data["name"],
         "type": "custom"
     }
-    profile_name = f"{manifest_data['name']-{manifest_data['game-version']}}"
-    profiles[profile_name] = profiles_data
+    profile_name = f"{manifest_data['name']}-{manifest_data['game-version']}"
+    profiles[profile_name] = custom_profile
 
-    print(json.dumps(
-        profiles,
+    return json.dumps(
+        launcher_data,
         indent=4
-        ))
+        )
 
 
 def download_pack(url:str, download_location:str, verbose=True) -> str:
