@@ -167,7 +167,7 @@ def compute_difference(server_domain:str, reference_install:str, target_version:
         version_content_file = f"{target_version}/{dreams.DirNames.FILE_VERSION_CONTENT}"
     else:
         return None
-    connection.request("GET",f"{parsed.path}{dreams.ServerLocation.VERSIONS}/{version_content_file}")
+    connection.request("GET",f"{parsed.path}/{dreams.DirNames.Server.VERSIONS}/{version_content_file}")
     with connection.getresponse() as response:
         if not response.status == 200:
             return None
@@ -199,7 +199,7 @@ def download_upgrade(
     queue_length = len(download_queue)
     try:
         for index, f in enumerate(download_queue):
-            connection.request("GET",urllib.parse.quote(f"{parsed.path}{dreams.ServerLocation.VERSIONS}/{target_version}/{f}"))
+            connection.request("GET",urllib.parse.quote(f"{parsed.path}/{dreams.DirNames.Server.VERSIONS}/{target_version}/{f}"))
             dl_target = f"{download_location}/{f}"
             if not os.path.isdir(os.path.dirname(dl_target)):
                 os.makedirs(os.path.dirname(dl_target))
@@ -356,7 +356,7 @@ def upgrade_pack(install_mode: str, install_location:str, repository:str, verbos
     latest = dreams_install.get_latest_release_name(repository)
 
     is_local = dreams.get_current_config_type().is_local
-    config_remote_root = f"{repository}/{dreams.ServerLocation.VERSIONS}/{latest[1]}"
+    config_remote_root = f"{repository}/{dreams.DirNames.Server.VERSIONS}/{latest[1]}"
     config = dreams.get_config(
         type=dreams.ConfigType(True,is_local),
         remote_root=config_remote_root

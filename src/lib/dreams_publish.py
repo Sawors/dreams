@@ -5,7 +5,8 @@ import lib.dreams as dreams
 
 def main(args:list):
     import pysftp
-    import paramiko    
+    import paramiko
+    from stat import S_ISDIR
     
     rel_dir = dreams.get_as_path(dreams.DirNames.RELEASES).replace("\\","/")
     manifest = dreams.get_manifest()
@@ -33,57 +34,99 @@ def main(args:list):
         return
 
     modpack_name = manifest['name']
-    remote_release_dir = f"webserver/modpacks/{modpack_name}/versions"
+    remote_root = "$HOME/webserver/modpacks"
+    remote_pack_root = f"{remote_root}/{modpack_name}"
+    remote_release_dir = f"{remote_pack_root}/{dreams.DirNames.Server.VERSIONS}"
 
-    release_bundle_command = f"cd $HOME/webserver/modpacks && python3 update_release.py {modpack_name}"
+    release_bundle_command = f"cd {remote_root} && python3 update_release.py {modpack_name}"
 
-    psswd = input(f"Password to the ftp server (u:{user}) : ").strip()
+    
+    ssh_client = paramiko.SSHClient()
+    ssh_client.load_system_host_keys()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_key_file = f"{os.path.expanduser('~')}/.ssh/id_rsa"
 
+    ssh_password = None
+    ssh_key = None
 
-    with pysftp.Connection(server, username=user, password=psswd) as sftp:
-        with sftp.cd(remotepath=remote_release_dir):
-            if latest in sftp.listdir("./"):
-                print("removing the old release...")
-                sftp.execute(f"cd $HOME/{remote_release_dir} && rm -R {latest}")
-            print("sending the new one...")
-            if not latest in sftp.listdir("./"):
-                sftp.mkdir(latest)
+    try:
+        ssh_key = paramiko.RSAKey.from_private_key_file(ssh_key_file)
+    except paramiko.PasswordRequiredException as e:
+        psswd = input(f"Please input the password for your ssh private key : ").strip()
+        ssh_key = paramiko.RSAKey.from_private_key_file(ssh_key_file,password=psswd)
+    except (IOError, paramiko.SSHException):
+        print("SSH privatekey loading failed, attempting to use password login instead...")
+        ssh_password = input(f"SSH login password (u:{user}) : ").strip()
 
-            transfer_queue = dict()
-            print("listing local files...")
-            for root,_,files in os.walk(latest_path):
-                for f in files:
-                    full_path = f"{root}/{f}".replace("\\","/")
-                    parent = os.path.dirname(full_path).replace("\\","/")
-                    rel_path = full_path.replace(f"{latest_path}/","")
-                    rel_parent = parent.replace(f"{latest_path}/","") if not parent == latest_path else ""
-                    rem_parent_path = f"{sftp.pwd}/{latest}/{rel_parent}"
-                    rem_file_path = f"{sftp.pwd}/{latest}/{rel_path}"
-                    if not sftp.isdir(rem_parent_path):
-                        sftp.makedirs(rem_parent_path)
-                    transfer_queue[full_path] = rem_file_path
-            print("local files discovered!")
-            print("sending to remote...")
-            for index,data in enumerate(transfer_queue.items()):
-                dreams.print_progess_bar(
-                    (index+1)/len(transfer_queue),
-                    50,
-                    f"transfering files : ({index+1}/{len(transfer_queue)}) ["
-                )
-                sftp.put(data[0],data[1])
-            print("all files sent to remote, executing release script on remote...")
+    ssh_client.connect(
+        server,
+        username=user,
+        password=ssh_password,
+        pkey=ssh_key
+    )
+        
+    with ssh_client.open_sftp() as sftp:
+        def is_dir(remote_path:str) -> bool:
+            try:
+                return S_ISDIR(sftp.stat(remote_path).st_mode)
+            except IOError:
+                return False
+        def rm_rec(remote_path:str):
+            if not is_dir(remote_path):
+                sftp.remove(remote_path)
+            else:
+                for f in sftp.listdir(remote_path):
+                    rm_rec(f"{remote_path}/{f}")
+                sftp.rmdir(remote_path)
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(server,username=user,password=psswd)
-    _, stdout, _ = ssh.exec_command(release_bundle_command)  # Non-blocking call
+        latest_dir = f"{remote_release_dir}/{latest}"
+
+        if latest in sftp.listdir(remote_release_dir):
+            print("removing the old release...")
+            rm_rec(latest_dir)
+        
+        print("sending the new one...")
+        if not latest in sftp.listdir(remote_release_dir):
+            sftp.mkdir(latest)
+        #
+        # OLD
+        #
+        transfer_queue = dict()
+        print("listing local files...")
+        for root,_,files in os.walk(latest_path):
+            for f in files:
+                full_path = f"{root}/{f}".replace("\\","/")
+                parent = os.path.dirname(full_path).replace("\\","/")
+                rel_path = full_path.replace(f"{latest_path}/","")
+                rel_parent = parent.replace(f"{latest_path}/","") if not parent == latest_path else ""
+                rem_parent_path = f"{latest_dir}/{rel_parent}"
+                rem_file_path = f"{latest_dir}/{rel_path}"
+                if not is_dir(rem_parent_path):
+                    sftp.mkdir(rem_parent_path)
+                transfer_queue[full_path] = rem_file_path
+        print("local files discovered!")
+        print("sending to remote...")
+        for index,data in enumerate(transfer_queue.items()):
+            dreams.print_progess_bar(
+                (index+1)/len(transfer_queue),
+                50,
+                f"transfering files : ({index+1}/{len(transfer_queue)}) ["
+            )
+            sftp.put(
+                localpath=data[0],
+                remotepath=data[1],
+                confirm=True
+            )
+        print("all files sent to remote, executing release script on remote...")
+
+    _, stdout, _ = ssh_client.exec_command(release_bundle_command)  # Non-blocking call
     stdout.channel.set_combine_stderr(True)
     exit_status = stdout.channel.recv_exit_status()          # Blocking call
     if exit_status == 0:
         print ("release successfully sent and bundled!")
     else:
         print("release was sent, but could not be bundled. ", exit_status)
-    ssh.close()
+    ssh_client.close()
 
 if __name__ == "__main__":
     main(os.sys.argv[1:])

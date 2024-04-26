@@ -145,7 +145,9 @@ f"""  Version difference detected:
     suggested: {adj_version}
     patchnote:
 {diff.patchnote(fancy=False,indent=8)}
-  Would you like to automatically increment the version from {version} to {adj_version} ?""")
+  Would you like to automatically increment the version from {version} to {adj_version} ?""",
+                default_accept=False
+                )
                 should_upgrade = answer
             if skip:
                 print("  no version difference found, ignoring auto increment.")

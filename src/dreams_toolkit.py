@@ -33,6 +33,9 @@ args_help_text = """Command line arguments :
                      shaderpacks/ from the .minecraft if it can be found
     --interactive    will ask the user for what to import and if the
                      installation should proceed
+    --profile, -p    install in a custom directory inside ".minecraft/profiles"
+    --inject, -i     create a launcher profile for the installation
+    -f="<file>"      skip to the installation using the provided archive
 
     UPGRADE:
     --server, -s     use a custom installation process made for servers
@@ -53,6 +56,13 @@ args_help_text = """Command line arguments :
 """
 
 def main(args):
+
+    # Bad way to do this, but since many users whose terminal does
+    # not support color are on Windows 10 with their ugly default
+    # terminal, it prevents most of the issues.
+    if platform.platform().replace(" ","-").startswith("Windows-10"):
+        args.append("--no-color")
+    
 
     lib.dreams._no_color_print = "--no-color" in args
 

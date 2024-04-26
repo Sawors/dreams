@@ -51,6 +51,16 @@ class DirNames:
     FILE_SERVER_MARKER = f"{SERVER}/is-server.json"
     FILE_VERSION_CHECKER = f"{CONFIG}/bcc.json"
 
+    class Minecraft:
+        PROFILES_DIR = "profiles"
+        VERSIONS_DIR = "versions"
+        LAUNCHER_PROFILES = "launcher_profiles.json"
+    
+    class Server:
+        LATEST_META = "latest.json"
+        LATEST_ARCHIVE = "latest.zip"
+        VERSIONS = "versions"
+
 class ConfigType(NamedTuple):
     # if true use client config
     # if false use server config
@@ -60,11 +70,6 @@ class ConfigType(NamedTuple):
     is_local: bool
 
 closing_tasks = []
-
-class ServerLocation:
-    LATEST_META = "/latest.json"
-    LATEST_ARCHIVE = "/latest.zip"
-    VERSIONS = "/versions"
 
 def get_location() -> str:
     path = f"{os.getcwd()}/install".replace("\\","/").split("/")
@@ -121,10 +126,18 @@ except FileNotFoundError:
 def get_root() -> str:
     return _ROOT
 
+def _set_root(root:str):
+    if not os.path.isdir(root):
+        raise FileNotFoundError("path to root does not exist")
+    _ROOT = root
+
 def get_manifest(root=get_root()) -> dict:
     path = f"{root}/{DirNames.FILE_MANIFEST}"
-    with open(path,"r") as fp:
-        return json.load(fp)
+    try:
+        with open(path,"r") as fp:
+            return json.load(fp)
+    except:
+        raise FileNotFoundError("manifest does not exist or is invalid")
     
 def get_as_path(file:str, root=get_root()) -> str:
     """returns the path to the file or directory within the profile root ({root}/{file})"""
