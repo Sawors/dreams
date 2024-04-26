@@ -34,7 +34,7 @@ def main(args:list):
         return
 
     modpack_name = manifest['name']
-    remote_root = "$HOME/webserver/modpacks"
+    remote_root = f"/home/{user}/webserver/modpacks"
     remote_pack_root = f"{remote_root}/{modpack_name}"
     remote_release_dir = f"{remote_pack_root}/{dreams.DirNames.Server.VERSIONS}"
 
@@ -80,14 +80,16 @@ def main(args:list):
                 sftp.rmdir(remote_path)
 
         latest_dir = f"{remote_release_dir}/{latest}"
-
+        print("")
+        print(latest_dir)
+        print("")
         if latest in sftp.listdir(remote_release_dir):
             print("removing the old release...")
             rm_rec(latest_dir)
         
         print("sending the new one...")
         if not latest in sftp.listdir(remote_release_dir):
-            sftp.mkdir(latest)
+            sftp.mkdir(latest_dir)
         #
         # OLD
         #
@@ -102,7 +104,11 @@ def main(args:list):
                 rem_parent_path = f"{latest_dir}/{rel_parent}"
                 rem_file_path = f"{latest_dir}/{rel_path}"
                 if not is_dir(rem_parent_path):
-                    sftp.mkdir(rem_parent_path)
+                    split = rem_parent_path.split("/")
+                    for index,elem in enumerate(split[1:]):
+                        subpath = "/".join(split[0:index+2])
+                        if not is_dir(subpath):
+                            sftp.mkdir(subpath)
                 transfer_queue[full_path] = rem_file_path
         print("local files discovered!")
         print("sending to remote...")
