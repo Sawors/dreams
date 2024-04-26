@@ -82,7 +82,7 @@ def inject_profile(minecraft_dir:str, custom_profile:dict) -> dict:
     profiles = launcher_data["profiles"]
 
     random_append = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-    profiles[f"{custom_profile["name"].replace(' ','_')}-{random_append}"] = custom_profile
+    profiles[f"{custom_profile['name'].replace(' ','_')}-{random_append}"] = custom_profile
 
     return launcher_data
 
